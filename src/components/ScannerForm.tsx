@@ -8,30 +8,33 @@ import { useScanner } from '@/hooks/useScanner';
 const ScannerForm = () => {
   const { toast } = useToast();
   const { scan, isScanning } = useScanner();
-  const [domain, setDomain] = React.useState('');
+  const [target, setTarget] = React.useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!domain) {
+    if (!target) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please enter a domain to scan",
+        description: "Please enter a domain or URL to scan",
       });
       return;
     }
 
-    if (!domain.match(/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/)) {
+    // URL validation regex that accepts domains and full URLs
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+\.[a-z\.]{2,6}|[\da-z\.-]+\.[a-z\.]{2,6}[\/\w \.-]*)*\/?(\?[\/\w \.-]*)?$/;
+
+    if (!target.match(urlPattern)) {
       toast({
         variant: "destructive",
-        title: "Invalid Domain",
-        description: "Please enter a valid domain name",
+        title: "Invalid Input",
+        description: "Please enter a valid domain or URL",
       });
       return;
     }
 
-    scan(domain);
+    scan(target);
   };
 
   return (
@@ -40,15 +43,15 @@ const ScannerForm = () => {
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">XSS Vulnerability Scanner</h2>
           <p className="text-sm text-muted-foreground">
-            Enter a domain to scan for potential XSS vulnerabilities
+            Enter a domain or URL to scan for potential XSS vulnerabilities
           </p>
         </div>
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="example.com"
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
+            placeholder="example.com or https://example.com/page?param=value"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
             className="flex-1"
           />
           <Button type="submit" disabled={isScanning}>

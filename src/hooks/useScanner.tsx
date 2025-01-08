@@ -27,10 +27,14 @@ export const useScanner = () => {
     {
       payload: '<svg/onload=alert("XSS")>',
       type: 'SVG-based XSS'
+    },
+    {
+      payload: '?param=<script>alert("XSS")</script>',
+      type: 'Parameter-based XSS'
     }
   ];
 
-  const scan = async (domain: string) => {
+  const scan = async (target: string) => {
     setIsScanning(true);
     setResults([]);
     
@@ -39,9 +43,23 @@ export const useScanner = () => {
 
     const scanResults: ScanResult[] = [];
 
+    // Add URL-specific vectors if the target includes parameters
+    const hasParameters = target.includes('?');
+    
     // Simulate vulnerability detection
     testXSSVectors.forEach((vector, index) => {
-      if (index % 2 === 0) { // Simulate finding some vulnerabilities
+      // For URLs with parameters, include parameter-based tests
+      if (hasParameters && vector.type === 'Parameter-based XSS') {
+        scanResults.push({
+          title: `${vector.type} Vulnerability Detected`,
+          description: `A potential ${vector.type} vulnerability was found in URL parameters that could allow attackers to inject malicious scripts.`,
+          severity: 'critical',
+          payload: vector.payload
+        });
+      }
+      
+      // Regular vulnerability checks
+      if (index % 2 === 0) {
         scanResults.push({
           title: `${vector.type} Vulnerability Detected`,
           description: `A potential ${vector.type} vulnerability was found that could allow attackers to inject malicious scripts.`,
