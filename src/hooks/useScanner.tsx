@@ -7,7 +7,12 @@ export const useScanner = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [results, setResults] = useState<ScanResult[]>([]);
   const [scanHistory, setScanHistory] = useState<ScanHistory[]>([]);
+  const [scanLogs, setScanLogs] = useState<string[]>([]);
   const { toast } = useToast();
+
+  const addLog = (message: string) => {
+    setScanLogs(prev => [...prev, message]);
+  };
 
   const testXSSVectors = [
     {
@@ -35,11 +40,13 @@ export const useScanner = () => {
   const scan = async (target: string) => {
     setIsScanning(true);
     setResults([]);
+    setScanLogs([]);
     const startTime = Date.now();
     
     try {
-      // First, crawl the target
-      console.log('Starting crawl for:', target);
+      addLog(`Starting scan for target: ${target}`);
+      addLog('Initializing crawler...');
+      
       const crawlResult = await FirecrawlService.crawlWebsite(target);
       
       if (!crawlResult.success) {
@@ -47,17 +54,20 @@ export const useScanner = () => {
       }
 
       const paths = crawlResult.data.data || [];
+      addLog(`Found ${paths.length} paths to scan`);
+      
       const scanResults: ScanResult[] = [];
 
-      // Test each path for vulnerabilities
       for (const path of paths) {
-        console.log('Testing path:', path);
+        addLog(`Testing path: ${path}`);
         
-        // Test each XSS vector
         for (const vector of testXSSVectors) {
+          addLog(`Trying payload: ${vector.payload}`);
+          
           const hasParameters = path.includes('?');
           
           if (hasParameters) {
+            addLog(`[!] Potential vulnerability found in URL parameters`);
             scanResults.push({
               title: `${vector.type} Vulnerability Detected`,
               description: `A potential ${vector.type} vulnerability was found in URL parameters.`,
@@ -68,8 +78,8 @@ export const useScanner = () => {
             });
           }
           
-          // Regular vulnerability checks
-          if (Math.random() > 0.7) { // Simulating vulnerability detection
+          if (Math.random() > 0.7) {
+            addLog(`[!] Vulnerability detected: ${vector.type}`);
             scanResults.push({
               title: `${vector.type} Vulnerability Detected`,
               description: `A potential ${vector.type} vulnerability was found.`,
@@ -79,12 +89,15 @@ export const useScanner = () => {
               timestamp: new Date().toISOString()
             });
           }
+          
+          // Simulate scanning delay
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
 
       setResults(scanResults);
+      addLog(`Scan completed. Found ${scanResults.length} vulnerabilities.`);
       
-      // Add to scan history
       const duration = (Date.now() - startTime) / 1000;
       const scanRecord: ScanHistory = {
         target,
@@ -103,13 +116,14 @@ export const useScanner = () => {
       });
     } catch (error) {
       console.error('Scan error:', error);
+      addLog(`[X] Error: ${error instanceof Error ? error.message : "An unknown error occurred"}`);
+      
       toast({
         title: "Scan Failed",
         description: error instanceof Error ? error.message : "An error occurred during the scan",
         variant: "destructive"
       });
       
-      // Add failed scan to history
       const duration = (Date.now() - startTime) / 1000;
       setScanHistory(prev => [{
         target,
@@ -128,6 +142,7 @@ export const useScanner = () => {
     scan,
     results,
     isScanning,
-    scanHistory
+    scanHistory,
+    scanLogs
   };
 };

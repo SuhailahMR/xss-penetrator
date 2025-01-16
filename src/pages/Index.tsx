@@ -4,7 +4,7 @@ import ScanResults from '@/components/ScanResults';
 import { useScanner } from '@/hooks/useScanner';
 
 const Index = () => {
-  const { results, isScanning } = useScanner();
+  const { results, isScanning, scanLogs } = useScanner();
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -17,7 +17,11 @@ const Index = () => {
         </div>
         
         <ScannerForm />
-        <ScanResults results={results} isScanning={isScanning} />
+        <ScanResults 
+          results={results} 
+          isScanning={isScanning} 
+          scanLogs={scanLogs} 
+        />
       </div>
     </div>
   );
