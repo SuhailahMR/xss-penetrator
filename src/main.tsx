@@ -1,10 +1,14 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import { initializeTheme } from './utils/theme';
 
-createRoot(document.getElementById("root")!).render(
+// Initialize theme before rendering
+initializeTheme();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
