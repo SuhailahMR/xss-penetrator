@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import type { ScanResult, ScanHistory } from '@/types/scanner';
-import { FirecrawlService } from '@/utils/FirecrawlService';
+import { processScanResults, crawlTarget } from '@/utils/scanUtils';
 
 export const useScanner = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -14,29 +14,6 @@ export const useScanner = () => {
     setScanLogs(prev => [...prev, message]);
   };
 
-  const testXSSVectors = [
-    {
-      payload: '<script>alert("XSS")</script>',
-      type: 'Reflected XSS'
-    },
-    {
-      payload: '"><script>alert("XSS")</script>',
-      type: 'DOM XSS'
-    },
-    {
-      payload: 'javascript:alert("XSS")//',
-      type: 'URL-based XSS'
-    },
-    {
-      payload: '<img src="x" onerror="alert(\'XSS\')">',
-      type: 'HTML Injection'
-    },
-    {
-      payload: '<svg/onload=alert("XSS")>',
-      type: 'SVG-based XSS'
-    }
-  ];
-
   const scan = async (target: string) => {
     setIsScanning(true);
     setResults([]);
@@ -47,54 +24,15 @@ export const useScanner = () => {
       addLog(`Starting scan for target: ${target}`);
       addLog('Initializing crawler...');
       
-      const crawlResult = await FirecrawlService.crawlWebsite(target);
-      
-      if (!crawlResult.success) {
-        throw new Error(crawlResult.error);
-      }
-
-      const paths = crawlResult.data.data || [];
+      const paths = await crawlTarget(target);
       addLog(`Found ${paths.length} paths to scan`);
       
-      const scanResults: ScanResult[] = [];
-
       for (const path of paths) {
         addLog(`Testing path: ${path}`);
-        
-        for (const vector of testXSSVectors) {
-          addLog(`Trying payload: ${vector.payload}`);
-          
-          const hasParameters = path.includes('?');
-          
-          if (hasParameters) {
-            addLog(`[!] Potential vulnerability found in URL parameters`);
-            scanResults.push({
-              title: `${vector.type} Vulnerability Detected`,
-              description: `A potential ${vector.type} vulnerability was found in URL parameters.`,
-              severity: 'critical',
-              payload: vector.payload,
-              path: path,
-              timestamp: new Date().toISOString()
-            });
-          }
-          
-          if (Math.random() > 0.7) {
-            addLog(`[!] Vulnerability detected: ${vector.type}`);
-            scanResults.push({
-              title: `${vector.type} Vulnerability Detected`,
-              description: `A potential ${vector.type} vulnerability was found.`,
-              severity: Math.random() > 0.5 ? 'critical' : 'high',
-              payload: vector.payload,
-              path: path,
-              timestamp: new Date().toISOString()
-            });
-          }
-          
-          // Simulate scanning delay
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate scanning delay
       }
 
+      const scanResults = processScanResults(paths);
       setResults(scanResults);
       addLog(`Scan completed. Found ${scanResults.length} vulnerabilities.`);
       
