@@ -19,9 +19,9 @@ export function Header() {
 
   return (
     <div className="border-b bg-[#800020] dark:bg-[#4d0013]">
-      <div className="flex h-16 items-center px-4">
+      <div className="flex h-16 items-center px-4 justify-between">
+        <h2 className="text-lg font-bold text-white">Threat Finder</h2>
         <div className="flex items-center space-x-6">
-          <h2 className="text-lg font-bold text-white">Threat Finder</h2>
           <MainNav />
           <Button
             variant="ghost"
