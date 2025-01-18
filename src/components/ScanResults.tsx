@@ -26,27 +26,25 @@ const SeverityIcon = ({ severity }: { severity: string }) => {
 
 const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs }) => {
   return (
-    <Card className="p-6 mt-4">
-      <ScrollArea className="h-[400px] rounded-md border bg-black p-4 font-mono text-sm">
-        <div className="space-y-1">
-          {scanLogs.map((log, index) => (
-            <div key={index} className="flex">
-              <span className="text-[#00ff00] mr-2">[scanner@threatfinder]$</span>
-              <span className="text-green-400">{log}</span>
-            </div>
-          ))}
-          {isScanning && (
-            <div className="flex">
-              <span className="text-[#00ff00] mr-2">[scanner@threatfinder]$</span>
-              <span className="text-green-400">
-                Scanning in progress
-                <span className="animate-blink ml-1">█</span>
-              </span>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
-    </Card>
+    <ScrollArea className="h-[400px] rounded-md border bg-black p-4 font-mono text-sm">
+      <div className="space-y-1">
+        {scanLogs.map((log, index) => (
+          <div key={index} className="flex">
+            <span className="text-[#00ff00] mr-2">[scanner@threatfinder]$</span>
+            <span className="text-green-400">{log}</span>
+          </div>
+        ))}
+        {isScanning && (
+          <div className="flex">
+            <span className="text-[#00ff00] mr-2">[scanner@threatfinder]$</span>
+            <span className="text-green-400">
+              Scanning in progress
+              <span className="animate-blink ml-1">█</span>
+            </span>
+          </div>
+        )}
+      </div>
+    </ScrollArea>
   );
 };
 
