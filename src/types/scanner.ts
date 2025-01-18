@@ -5,6 +5,7 @@ export interface ScanResult {
   payload?: string;
   path?: string;
   timestamp?: string;
+  location: string; // Added this property
 }
 
 export interface ScannerState {
