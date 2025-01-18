@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Header } from "@/components/Header";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Results from "./pages/Results";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App: React.FC = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/results" element={<Results />} />
             </Routes>
           </div>
         </div>
