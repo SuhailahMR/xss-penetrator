@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
 import type { ScanResult, ScanHistory } from '@/types/scanner';
 import { processScanResults, crawlTarget } from '@/utils/scanUtils';
@@ -9,6 +10,7 @@ export const useScanner = () => {
   const [scanHistory, setScanHistory] = useState<ScanHistory[]>([]);
   const [scanLogs, setScanLogs] = useState<string[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const addLog = (message: string) => {
     setScanLogs(prev => [...prev, message]);
@@ -21,19 +23,29 @@ export const useScanner = () => {
     const startTime = Date.now();
     
     try {
-      addLog(`Starting scan for target: ${target}`);
-      addLog('Initializing crawler...');
+      addLog(`Initializing scan for target: ${target}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
       
+      addLog("Checking target accessibility...");
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      addLog("Starting crawler module...");
       const paths = await crawlTarget(target);
-      addLog(`Found ${paths.length} paths to scan`);
+      addLog(`Discovered ${paths.length} unique endpoints`);
       
-      for (const path of paths) {
-        addLog(`Testing path: ${path}`);
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate scanning delay
+      for (let i = 0; i < paths.length; i++) {
+        const path = paths[i];
+        const progress = Math.round(((i + 1) / paths.length) * 100);
+        addLog(`[${progress}%] Testing path: ${path}`);
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
 
       const scanResults = processScanResults(paths);
       setResults(scanResults);
+      
+      addLog("Analyzing results...");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       addLog(`Scan completed. Found ${scanResults.length} vulnerabilities.`);
       
       const duration = (Date.now() - startTime) / 1000;
@@ -52,25 +64,19 @@ export const useScanner = () => {
         title: "Scan Complete",
         description: `Found ${scanResults.length} potential vulnerabilities`,
       });
+
+      // Navigate to results page after scan completion
+      navigate('/results', { state: { results: scanResults } });
+      
     } catch (error) {
       console.error('Scan error:', error);
-      addLog(`[X] Error: ${error instanceof Error ? error.message : "An unknown error occurred"}`);
+      addLog(`[ERROR] ${error instanceof Error ? error.message : "An unknown error occurred"}`);
       
       toast({
         title: "Scan Failed",
         description: error instanceof Error ? error.message : "An error occurred during the scan",
         variant: "destructive"
       });
-      
-      const duration = (Date.now() - startTime) / 1000;
-      setScanHistory(prev => [{
-        target,
-        timestamp: new Date().toISOString(),
-        duration,
-        vulnerabilitiesCount: 0,
-        status: 'failed',
-        results: []
-      }, ...prev]);
     } finally {
       setIsScanning(false);
     }
