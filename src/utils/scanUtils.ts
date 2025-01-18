@@ -16,7 +16,8 @@ export const processScanResults = (paths: string[]): ScanResult[] => {
           severity: 'critical',
           payload: vector.payload,
           path: path,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          location: `${path}?${vector.payload}`
         });
       }
       
@@ -27,7 +28,8 @@ export const processScanResults = (paths: string[]): ScanResult[] => {
           severity: Math.random() > 0.5 ? 'critical' : 'high',
           payload: vector.payload,
           path: path,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          location: path
         });
       }
     });
