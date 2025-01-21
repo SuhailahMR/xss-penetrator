@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome Cross Site Scripting (XSS)
 
 ## How can I edit this code?
 
