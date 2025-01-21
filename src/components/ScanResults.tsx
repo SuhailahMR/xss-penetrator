@@ -10,10 +10,10 @@ interface ScanResultsProps {
 
 const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs }) => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
+    <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[80vh]">
+      <div className="grid gap-6 md:grid-cols-3 max-w-6xl">
         <Card className="backdrop-blur-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
-          <CardHeader>
+          <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
               Reflected XSS
             </CardTitle>
@@ -25,7 +25,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
         </Card>
 
         <Card className="backdrop-blur-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
-          <CardHeader>
+          <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-600 bg-clip-text text-transparent">
               Stored XSS
             </CardTitle>
@@ -37,7 +37,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
         </Card>
 
         <Card className="backdrop-blur-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
-          <CardHeader>
+          <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent">
               DOM-based XSS
             </CardTitle>
