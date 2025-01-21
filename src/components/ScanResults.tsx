@@ -12,7 +12,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
   return (
     <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[80vh]">
       <div className="grid gap-6 md:grid-cols-3 max-w-6xl">
-        <Card className="backdrop-blur-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+        <Card className="backdrop-blur-lg dark:bg-white/10 bg-[#FDE1D3] dark:border-white/20 border-orange-200 hover:bg-[#ffd4c0] dark:hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
               Reflected XSS
@@ -24,7 +24,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
           </CardHeader>
         </Card>
 
-        <Card className="backdrop-blur-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+        <Card className="backdrop-blur-lg dark:bg-white/10 bg-[#D3E4FD] dark:border-white/20 border-blue-200 hover:bg-[#c0d8f7] dark:hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-600 bg-clip-text text-transparent">
               Stored XSS
@@ -36,7 +36,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
           </CardHeader>
         </Card>
 
-        <Card className="backdrop-blur-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+        <Card className="backdrop-blur-lg dark:bg-white/10 bg-[#F2FCE2] dark:border-white/20 border-green-200 hover:bg-[#e5f7cc] dark:hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent">
               DOM-based XSS
