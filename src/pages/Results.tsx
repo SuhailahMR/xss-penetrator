@@ -4,6 +4,15 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Shield, ShieldAlert, ShieldCheck, Clock, Globe, Download } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import type { ScanResult } from '@/types/scanner';
 import jsPDF from 'jspdf';
 
@@ -16,6 +25,35 @@ const Results = () => {
   const totalSubdomains = results.length;
   const safeSubdomains = results.filter((r: ScanResult) => r.severity === 'low' || r.severity === 'medium').length;
   const maliciousSubdomains = results.filter((r: ScanResult) => r.severity === 'high' || r.severity === 'critical').length;
+
+  const getMitigationTechnique = (severity: string) => {
+    switch (severity) {
+      case 'critical':
+        return [
+          "Implement immediate input validation and sanitization",
+          "Use Content Security Policy (CSP) headers",
+          "Apply WAF rules to block malicious payloads",
+          "Regular security audits and penetration testing",
+          "Update all dependencies and frameworks to latest secure versions"
+        ];
+      case 'high':
+        return [
+          "Implement proper input validation",
+          "Use HTML encoding for user inputs",
+          "Implement XSS filters",
+          "Regular code reviews",
+          "Security awareness training for developers"
+        ];
+      default:
+        return [
+          "Follow secure coding practices",
+          "Keep systems and dependencies updated",
+          "Regular security assessments",
+          "Document security requirements",
+          "Monitor for suspicious activities"
+        ];
+    }
+  };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
@@ -51,6 +89,45 @@ const Results = () => {
     yPos += 10;
     pdf.text(`Malicious Subdomains: ${maliciousSubdomains}`, 20, yPos);
     yPos += 20;
+
+    // Add mitigation techniques section
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Mitigation Techniques by Severity", 20, yPos);
+    yPos += 15;
+
+    // Critical severity mitigations
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.text("Critical Severity:", 20, yPos);
+    yPos += 10;
+    pdf.setFont("helvetica", "normal");
+    getMitigationTechnique('critical').forEach(technique => {
+      pdf.text(`• ${technique}`, 25, yPos);
+      yPos += 7;
+    });
+    yPos += 5;
+
+    // High severity mitigations
+    pdf.setFont("helvetica", "bold");
+    pdf.text("High Severity:", 20, yPos);
+    yPos += 10;
+    pdf.setFont("helvetica", "normal");
+    getMitigationTechnique('high').forEach(technique => {
+      pdf.text(`• ${technique}`, 25, yPos);
+      yPos += 7;
+    });
+    yPos += 5;
+
+    // Medium/Low severity mitigations
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Medium/Low Severity:", 20, yPos);
+    yPos += 10;
+    pdf.setFont("helvetica", "normal");
+    getMitigationTechnique('medium').forEach(technique => {
+      pdf.text(`• ${technique}`, 25, yPos);
+      yPos += 7;
+    });
+    yPos += 15;
 
     // Add scan results
     pdf.setFont("helvetica", "bold");
@@ -128,6 +205,54 @@ const Results = () => {
           </CardHeader>
         </Card>
       </div>
+
+      {/* Mitigation Techniques Table */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Mitigation Techniques</CardTitle>
+          <CardDescription>Recommended actions based on vulnerability severity</CardDescription>
+        </CardHeader>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Severity</TableHead>
+              <TableHead>Recommended Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium text-red-500">Critical</TableCell>
+              <TableCell>
+                <ul className="list-disc pl-4">
+                  {getMitigationTechnique('critical').map((technique, index) => (
+                    <li key={index}>{technique}</li>
+                  ))}
+                </ul>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium text-orange-500">High</TableCell>
+              <TableCell>
+                <ul className="list-disc pl-4">
+                  {getMitigationTechnique('high').map((technique, index) => (
+                    <li key={index}>{technique}</li>
+                  ))}
+                </ul>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium text-yellow-500">Medium/Low</TableCell>
+              <TableCell>
+                <ul className="list-disc pl-4">
+                  {getMitigationTechnique('medium').map((technique, index) => (
+                    <li key={index}>{technique}</li>
+                  ))}
+                </ul>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Card>
 
       {/* Download Button */}
       <div className="flex justify-end mb-8">
