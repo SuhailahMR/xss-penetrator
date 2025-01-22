@@ -13,9 +13,11 @@ interface ScanResultsProps {
 
 const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs }) => {
   const scanTime = new Date().toLocaleString();
-  const totalSubdomains = 15; // This would come from your actual scan data
-  const safeSubdomains = 12; // This would come from your actual scan data
-  const maliciousSubdomains = 3; // This would come from your actual scan data
+  
+  // Calculate statistics based on real-time results
+  const totalSubdomains = results.length;
+  const safeSubdomains = results.filter(r => r.severity === 'low' || r.severity === 'medium').length;
+  const maliciousSubdomains = results.filter(r => r.severity === 'high' || r.severity === 'critical').length;
 
   const downloadPDF = () => {
     const pdf = new jsPDF();
@@ -39,14 +41,16 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
     pdf.text(`Malicious Subdomains: ${maliciousSubdomains}`, 20, yPos);
     yPos += 20;
 
-    // Add vulnerability types
+    // Add scan results
     pdf.setFont("helvetica", "bold");
-    pdf.text("Vulnerability Types:", 20, yPos);
+    pdf.text("Detailed Results:", 20, yPos);
     yPos += 10;
 
     pdf.setFont("helvetica", "normal");
-    ["Reflected XSS", "Stored XSS", "DOM-based XSS"].forEach(type => {
-      pdf.text(`• ${type}`, 30, yPos);
+    results.forEach(result => {
+      pdf.text(`• ${result.title} (${result.severity})`, 30, yPos);
+      yPos += 7;
+      pdf.text(`  Location: ${result.location}`, 35, yPos);
       yPos += 10;
     });
 
@@ -112,6 +116,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({ results, isScanning, scanLogs
         <Button
           onClick={downloadPDF}
           className="bg-[#800020] hover:bg-[#4d0013] text-white font-mono flex items-center gap-2"
+          disabled={results.length === 0}
         >
           <Download className="w-4 h-4" />
           Download Report
