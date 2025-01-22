@@ -12,7 +12,7 @@ const Index = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">XSS Vulnerability Scanner</h1>
           <p className="text-muted-foreground">
-            Military-grade security assessment tool for Cross-Site Scripting vulnerabilities
+            Cross Site Scripting Security Assessment Tool for Web Applications
           </p>
         </div>
         
