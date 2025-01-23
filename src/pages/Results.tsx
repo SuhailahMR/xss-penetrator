@@ -71,76 +71,123 @@ const Results = () => {
   const downloadPDF = () => {
     const pdf = new jsPDF();
     let yPos = 20;
+    const pageHeight = pdf.internal.pageSize.height;
+    const margin = 20;
+
+    const addNewPage = () => {
+      pdf.addPage();
+      yPos = 20;
+    };
+
+    const checkPageBreak = (increment: number) => {
+      if (yPos + increment >= pageHeight - margin) {
+        addNewPage();
+      }
+    };
 
     // Add title
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(20);
-    pdf.text("XSS Vulnerability Scan Report", 20, yPos);
+    pdf.text("XSS Vulnerability Scan Report", margin, yPos);
     yPos += 20;
 
     // Add scan information
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "normal");
-    pdf.text(`Scan Time: ${scanTime}`, 20, yPos);
+    pdf.text(`Scan Time: ${scanTime}`, margin, yPos);
     yPos += 10;
-    pdf.text(`Total Subdomains: ${totalSubdomains}`, 20, yPos);
+    pdf.text(`Total Subdomains: ${totalSubdomains}`, margin, yPos);
     yPos += 10;
-    pdf.text(`Safe Subdomains: ${safeSubdomains}`, 20, yPos);
+    pdf.text(`Safe Subdomains: ${safeSubdomains}`, margin, yPos);
     yPos += 10;
-    pdf.text(`Malicious Subdomains: ${maliciousSubdomains}`, 20, yPos);
+    pdf.text(`Malicious Subdomains: ${maliciousSubdomains}`, margin, yPos);
     yPos += 20;
+
+    checkPageBreak(40);
 
     // Add mitigation techniques section
     pdf.setFont("helvetica", "bold");
-    pdf.text("Mitigation Techniques by Severity", 20, yPos);
+    pdf.text("Mitigation Techniques by Severity", margin, yPos);
     yPos += 15;
 
     // Critical severity mitigations
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(11);
-    pdf.text("Critical Severity:", 20, yPos);
+    checkPageBreak(60);
+    pdf.text("Critical Severity:", margin, yPos);
     yPos += 10;
     pdf.setFont("helvetica", "normal");
     getMitigationTechnique('critical').forEach(technique => {
+      checkPageBreak(10);
       pdf.text(`• ${technique}`, 25, yPos);
       yPos += 7;
     });
     yPos += 5;
 
     // High severity mitigations
+    checkPageBreak(60);
     pdf.setFont("helvetica", "bold");
-    pdf.text("High Severity:", 20, yPos);
+    pdf.text("High Severity:", margin, yPos);
     yPos += 10;
     pdf.setFont("helvetica", "normal");
     getMitigationTechnique('high').forEach(technique => {
+      checkPageBreak(10);
       pdf.text(`• ${technique}`, 25, yPos);
       yPos += 7;
     });
     yPos += 5;
 
     // Medium/Low severity mitigations
+    checkPageBreak(60);
     pdf.setFont("helvetica", "bold");
-    pdf.text("Medium/Low Severity:", 20, yPos);
+    pdf.text("Medium/Low Severity:", margin, yPos);
     yPos += 10;
     pdf.setFont("helvetica", "normal");
     getMitigationTechnique('medium').forEach(technique => {
+      checkPageBreak(10);
       pdf.text(`• ${technique}`, 25, yPos);
       yPos += 7;
     });
     yPos += 15;
 
     // Add scan results
+    checkPageBreak(40);
     pdf.setFont("helvetica", "bold");
-    pdf.text("Detailed Results:", 20, yPos);
+    pdf.text("Detailed Results:", margin, yPos);
     yPos += 10;
 
     pdf.setFont("helvetica", "normal");
     results.forEach((result: ScanResult) => {
+      checkPageBreak(25);
       pdf.text(`• ${result.title} (${result.severity})`, 30, yPos);
       yPos += 7;
-      pdf.text(`  Location: ${result.location}`, 35, yPos);
+      
+      // Split long location strings into multiple lines if needed
+      const locationText = `Location: ${result.location}`;
+      const textWidth = pdf.getStringUnitWidth(locationText) * 11; // 11 is the font size
+      const maxWidth = pdf.internal.pageSize.width - 40; // 40 is twice the margin
+      
+      if (textWidth > maxWidth) {
+        const splitLocation = pdf.splitTextToSize(locationText, maxWidth - 35);
+        splitLocation.forEach((line: string) => {
+          checkPageBreak(10);
+          pdf.text(line, 35, yPos);
+          yPos += 7;
+        });
+      } else {
+        pdf.text(locationText, 35, yPos);
+        yPos += 7;
+      }
       yPos += 10;
     });
+
+    // Add footer with page numbers
+    const pageCount = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(10);
+      pdf.text(`Page ${i} of ${pageCount}`, pdf.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
+    }
 
     // Save the PDF
     pdf.save("xss-scan-results.pdf");
